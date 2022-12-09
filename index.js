@@ -7,20 +7,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let traveledDistance = 0;
     let activeSlide;
     
-    let isDown = false;
-    let pointerStartingPosition;
-    
     const getTranslateDistance = () => {
         translateDistance += centeredSlides[0].offsetWidth;
     }
     getTranslateDistance();
-    const sleep = (milliseconds) => {
-        const date = Date.now();
-        let currentDate = null;
-        do {
-          currentDate = Date.now();
-        } while (currentDate - date < milliseconds);
-    }
+
     const getSlidesArray = () => {
         return [...document.querySelectorAll(`.slider-centered-slide`)];
     }
@@ -79,7 +70,6 @@ document.addEventListener('DOMContentLoaded', () => {
     centeredSlidesWrapper.addEventListener('click', (e) => {
         if (e.target.classList.contains('slider-centered-slide')) {
             let direction;
-            //toggleSlideActiveClass(e.target);
             let slidesArray = getSlidesArray();
             let clickedslideIndex = slidesArray.indexOf(e.target);
             (clickedslideIndex - 6) > 0 ? direction="next" : direction="prev"
