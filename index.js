@@ -1,16 +1,12 @@
 document.addEventListener('DOMContentLoaded', () => {
 
+    const root = document.documentElement;
     const centeredSlides = document.querySelectorAll(`.slider-centered-slide`);
     const centeredSlidesWrapper = document.querySelector(`.slider-centered-wrapper`);
     const directionBtns = document.querySelectorAll(`[data-direction]`);
-    let translateDistance = 6;
+    let translateDistance;
     let traveledDistance = 0;
     let activeSlide;
-    
-    const getTranslateDistance = () => {
-        translateDistance += centeredSlides[0].offsetWidth;
-    }
-    getTranslateDistance();
 
     const getSlidesArray = () => {
         return [...document.querySelectorAll(`.slider-centered-slide`)];
@@ -26,34 +22,50 @@ document.addEventListener('DOMContentLoaded', () => {
         if (direction === 'next') {
             newSlide = slidesArray[2].cloneNode(true);
             centeredSlidesWrapper.appendChild(newSlide);
-            centeredSlidesWrapper.removeChild(centeredSlidesWrapper.firstElementChild);
         } else {
             newSlide = slidesArray[10].cloneNode(true);
             centeredSlidesWrapper.insertBefore(newSlide, centeredSlidesWrapper.children[0]);
+        }
+    }
+    const removeExcessSlide = (direction) => {
+        if (direction === 'next') {
+            centeredSlidesWrapper.removeChild(centeredSlidesWrapper.firstElementChild);
+        } else {
             centeredSlidesWrapper.removeChild(centeredSlidesWrapper.lastElementChild);
         }
-        traveledDistance = 0;
-        centeredSlidesWrapper.style.setProperty('--translateDistance', `${traveledDistance}px`);
-        const timeout = setTimeout(() => {
-            //centeredSlidesWrapper.style.setProperty('--translateDistance', `${traveledDistance}px`);
-        }, 500);
     }
     const handleSlideChange = (direction) => {
         let newActiveSlide
         if (direction === 'next') {
             newActiveSlide = activeSlide.nextElementSibling;
             traveledDistance -= translateDistance;
+            root.style.setProperty('--transformOrigin', `right`);
         } else {
             newActiveSlide = activeSlide.previousElementSibling
             traveledDistance += translateDistance
+            root.style.setProperty('--transformOrigin', `left`);
         }
-        toggleSlideActiveClass(newActiveSlide)
-        centeredSlidesWrapper.style.setProperty('--translateDistance', `${traveledDistance}px`);
-        activeSlide = newActiveSlide;
+        //root.style.setProperty('--translateDistance', `${traveledDistance}px`);
         addNewSideSlides(direction);
+        toggleSlideActiveClass(newActiveSlide);
+        //const removeExcessSlideDelay = setTimeout(() => {
+            //traveledDistance = 0;
+            //root.style.setProperty('--translateDistance', `${traveledDistance}px`);
+        //}, 250);
+        removeExcessSlide(direction);
+        traveledDistance = 0;
+        root.style.setProperty('--translateDistance', `${traveledDistance}px`);
+        activeSlide = newActiveSlide;
     }
     // INIT
     const init = () => {
+        let wrapperWidth = centeredSlidesWrapper.offsetWidth
+        root.style.setProperty('--slidesGap', `${wrapperWidth*0.005}px`);
+        root.style.setProperty('--slideWidth', `${wrapperWidth*0.045}px`);
+        root.style.setProperty('--slideMinWidth', `${wrapperWidth*0.045}px`);
+        root.style.setProperty('--activeSlideWidth', `${wrapperWidth*0.5}px`);
+        root.style.setProperty('--activeSlideMinWidth', `${wrapperWidth*0.5}px`);
+        translateDistance = (wrapperWidth*0.045) + (wrapperWidth*0.005);
         let slidesArray = getSlidesArray();
         let leftNewSlide = slidesArray[10].cloneNode(true);
         let rightNewSlide = slidesArray[0].cloneNode(true);
