@@ -45,16 +45,16 @@ document.addEventListener('DOMContentLoaded', () => {
             traveledDistance += translateDistance
             root.style.setProperty('--transformOrigin', `left`);
         }
-        //root.style.setProperty('--translateDistance', `${traveledDistance}px`);
+        root.style.setProperty('--translateDistance', `${traveledDistance}px`);
         addNewSideSlides(direction);
         toggleSlideActiveClass(newActiveSlide);
-        //const removeExcessSlideDelay = setTimeout(() => {
-            //traveledDistance = 0;
-            //root.style.setProperty('--translateDistance', `${traveledDistance}px`);
-        //}, 250);
+        traveledDistance = 0;
+        const removeExcessSlideDelay = setTimeout(() => {
+            root.style.setProperty('--translateDistance', `${traveledDistance}px`);
+        }, 250);
         removeExcessSlide(direction);
         traveledDistance = 0;
-        root.style.setProperty('--translateDistance', `${traveledDistance}px`);
+        //root.style.setProperty('--translateDistance', `${traveledDistance}px`);
         activeSlide = newActiveSlide;
     }
     // INIT
@@ -79,24 +79,37 @@ document.addEventListener('DOMContentLoaded', () => {
     directionBtns.forEach(btn => {
         btn.addEventListener('click', (e) => handleSlideChange(e.target.dataset.direction))
     })
-    centeredSlidesWrapper.addEventListener('click', (e) => {
-        if (e.target.classList.contains('slider-centered-slide')) {
-            let direction;
-            let slidesArray = getSlidesArray();
-            let clickedslideIndex = slidesArray.indexOf(e.target);
-            (clickedslideIndex - 6) > 0 ? direction="next" : direction="prev"
-            let counter = Math.abs(clickedslideIndex - 6);
-            while (counter > 0) {
-                handleSlideChange(direction);
-                counter--;
-            }  
-            activeSlide = e.target;
+    let startPosition;
+    let positionChange;
+    let isPointerDown = false;
+    centeredSlidesWrapper.addEventListener('pointerdown', (e) => {
+        isPointerDown = true;
+        startPosition = e.clientX;
+    });
+    centeredSlidesWrapper.addEventListener('pointermove', (e) => {
+        e.preventDefault();
+        if (isPointerDown) {
+            let touchPosition = e.clientX;
+            positionChange = startPosition - touchPosition;
         }
-    })
-
-
-
-
-
-
+    });
+    centeredSlidesWrapper.addEventListener('pointerup', (e) => {
+        if (e.target.classList.contains('slider-centered-slide')) {
+            if (e.target.classList.contains('active')) {
+                if (positionChange > 0) handleSlideChange('next');
+                if (positionChange < 0) handleSlideChange('prev');
+            } else {
+                let direction;
+                let slidesArray = getSlidesArray();
+                let clickedslideIndex = slidesArray.indexOf(e.target);
+                (clickedslideIndex - 6) > 0 ? direction="next" : direction="prev";
+                let counter = Math.abs(clickedslideIndex - 6);
+                while (counter > 0) {
+                    handleSlideChange(direction);
+                    counter--;
+                }  
+            } 
+        }
+        isPointerDown = false;
+    });
 })

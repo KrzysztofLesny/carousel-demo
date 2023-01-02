@@ -25,6 +25,7 @@
     transform: translateX(var(--translateDistance));
     transform-origin: var(--transformOrigin);
     transition: transform 500ms linear;
+    touch-action: none;
 }
 .slider-centered-slide {
     width: var(--slideWidth);
